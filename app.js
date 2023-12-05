@@ -1,6 +1,6 @@
 const createDB = require('./database/utils/createDB');
 const seedDB = require('./database/utils/seedDB');
-const { Console, Game } = require('./database/models');
+const { User, Team } = require('./database/models');
 const ash = require('express-async-handler');
 
 const db = require('./database');
@@ -33,7 +33,107 @@ const configureApp = async () => {
 
 
  
+  app.get("/hello", (request, response) => {
+    response.send("hello world!")
+  });
+ 
+ 
+  //user routes
 
+  app.get('/user/', ash(async(req, res) => {
+    let user = await User.findAll();
+    res.status(200).json(user);
+  }));
+
+  //get specific user
+  app.get('/user/:id', ash(async(req,res) =>{
+    let user = await User.findByPk(req.params.id, {include:[Team]}); // based on the value from :id, we will get that specific instance
+    res.status(200).json(user)
+  }));
+
+   //adding new user 
+   app.post('/user', function(req,res,next){
+    User.create(req.body).then(createdUser => res.status(200).json(createdUser))
+    .catch(err => next(err))
+  })
+
+ //changes in user password or username
+  app.put('/user/:id', ash(async(req, res) => {
+    await User.update(req.body,
+          { where: {id: req.params.id} }
+    );
+    let user = await User.findByPk(req.params.id);
+    res.status(201).json(user);
+  }));   
+
+  //deleting an user
+  app.delete('/user/:id', function(req, res, next) {
+    User.destroy({
+      where: {
+        id: req.params.id
+      }
+    })
+      .then(() => res.status(200).json("Deleted a user!"))
+      .catch(err => next(err));
+  });
+
+  // team routes
+
+  //get all the team's from team table
+  app.get('/team/', ash(async(req, res) => {
+    let team = await Team.findAll();
+    res.status(200).json(team);
+  }));
+
+  //get specific team
+  app.get('/team/:id', ash(async(req,res) =>{
+    let team = await Team.findByPk(req.params.id, {include:[User]}); // based on the value from :id, we will get that specific instance
+    res.status(200).json(team)
+  }));
+
+  //adding new team 
+  app.post('/team', function(req,res,next){
+    Team.create(req.body).then(createdTeam => res.status(200).json(createdTeam))
+    .catch(err => next(err))
+  })
+
+  //changes the player on a team
+  app.put('/team/:id', ash(async(req, res) => {
+    await Team.update(req.body,
+          { where: {id: req.params.id} }
+    );
+    let team = await Team.findByPk(req.params.id);
+    res.status(201).json(team);
+  }));
+
+  //deleting an entire team
+  app.delete('/team/:id', function(req, res, next) {
+    Team.destroy({
+      where: {
+        id: req.params.id
+      }
+    })
+      .then(() => res.status(200).json("Deleted a team!"))
+      .catch(err => next(err));
+  });
+
+  // this deletes a specific player on a specific team 
+  app.delete('/team/:id/:position', function(req, res, next) {
+    const position = req.params.position
+    const teamid = req.params.id
+
+
+    Team.update(
+
+        {[position]: null},
+        {where: {id:teamid }},
+
+    )
+      .then(() => res.status(200).json("Deleted a Point Guard!"))
+      .catch(err => next(err));
+  });
+  
+ 
 
 
   // Handle page not found:
