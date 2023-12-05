@@ -1,4 +1,4 @@
-const dbName = 'practice-backend';
+const dbName = 'webdevbackend';
 const dbUser = 'yourname';
 const dbPwd = 'password';
 

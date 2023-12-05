@@ -1,39 +1,59 @@
-const { Game, Console } = require('../models');
+const { User, Team } = require('../models');
 
 const seedDB = async () => {
-	const dummyGame = await Game.create({
-		title: "Halo 2",
-		date: "November 9, 2004",
-		rating: "9"
-	});
-	const dummyGame2 = await Game.create({
-		title: "Call Of Duty 3",
-		date: "November 7, 2006",
-        rating: "8"
+	const dummyUser= await User.create({
+		user: "mahathir",
+		pwd: "ilovehotdogs",
 	});
 
-    const dummyGame3 = await Game.create({
-		title: "Marvel's Spider-Man",
-		date: "September 7, 2018",
-        rating: "10"
+    const dummyUser2= await User.create({
+		user: "aurnab",
+		pwd: "iloveicecream",
 	});
+	
 
-	const dummyConsole = await Console.create({
-		title: "Xbox",
-        company: "Microsoft",
-        year_founded: "April 4, 1975"
+    const dummyTeam = await Team.create({
+        Name: "Boston",
+		PG: "Ja Morant",
+        SG: "Cam Thomas",
+        G: "Tyrese Haliburton",
+        SF: "Lebron James",
+        PF: "Domantas Sabonis",
+        C1: "Nikola Jokic",
+        C2: "Joel Embid",
+        C3: "Rudy Golbert",
+        Any1: "Jalen Brunson",
+        Any2: "Joe Ingles",
+        userId: dummyUser.id
+        
         
 	});
 
-    const dummyConsole2 = await Console.create({
-		title: "Playstation",
-        company: "Sony",
-        year_founded: "May 7, 1946"
+    const dummyTeam2 = await Team.create({
+        Name: "New York",
+		PG: "Trae Young",
+        SG: "Klay Thompson",
+        G: "Tyrese Haliburton",
+        SF: "Kevin Durant",
+        PF: "Chet Holmgren",
+        C1: "Brook Lopez",
+        C2: "Joel Embid",
+        C3: "Rudy Golbert",
+        Any1: "Kawhi Leonard",
+        Any2: "Jayson Tatum",
+        userId: dummyUser2.id
         
 	});
     
 
-	await dummyConsole.setGame(dummyGame);
+    // the setUser is only aviable because of line 5 in index.js within models/index.js. 
+    // this is because the foreign key of teams belong to users 
+	// await dummyUser.setTeam(dummyTeam);
+
+    // this is the correct one users to multiple team 
+    // await dummyTeam.setUser(dummyUser);
+
+    
 	
 }
 
