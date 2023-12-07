@@ -2,7 +2,7 @@
 
 // Module dependencies;
 const Sequelize = require('sequelize');
-const {dbName, dbUser, dbPwd} = require('./utils/configDB');
+const {dbName, dbUser, dbPwd, dbHost} = require('./utils/configDB');
 
 // Confirmation message (limit these in production);
 console.log('Opening database connection');
