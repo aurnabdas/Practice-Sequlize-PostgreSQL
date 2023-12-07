@@ -5,6 +5,12 @@ const ash = require('express-async-handler');
 
 const db = require('./database');
 
+
+const corsOptions = {
+  origin: 'http://localhost:3000', // Client app's URL
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+};
+
 //sync and seed
 const syncDatabase = async () => {
   try {
@@ -25,8 +31,14 @@ const express = require("express");
 const app = express();
 const cors = require('cors')
 
+const handleLogin = require('./middlware/auth')
+
+
 const configureApp = async () => {
-  app.use(cors());
+  app.use(cors(corsOptions)); // Use CORS with configured options
+  app.options('*', cors(corsOptions)); // Enable preflight requests for all routes
+
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.get('/favicon.ico', (req, res) => res.status(204));
@@ -37,7 +49,7 @@ const configureApp = async () => {
     response.send("hello world!")
   });
  
- 
+app.post('/auth', handleLogin);
   //user routes
 
   app.get('/user/', ash(async(req, res) => {

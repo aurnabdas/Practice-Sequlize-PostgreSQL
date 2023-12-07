@@ -1,5 +1,5 @@
 const pgtools = require('pgtools');
-const {dbName, dbUser, dbPwd} = require('./configDB');
+const {dbName, dbUser, dbPwd, dbHost} = require('./configDB');
 
 
 const config = {
