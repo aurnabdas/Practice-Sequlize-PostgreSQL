@@ -8,7 +8,7 @@ ensure docker is installed and run the following code:
 
 ```bash  
 
-docker run --name postgres -e POSTGRES_PASSWORD=mypass -e POSTGRES_USER=$USER -p 5432:5432 -d postgres
+docker run --name postgres -e POSTGRES_PASSWORD=mypass -e POSTGRES_USER=dev -p 5432:5432 -d postgres
 
 ```
 
