@@ -32,7 +32,7 @@ const app = express();
 const cors = require('cors')
 
 const handleLogin = require('./middlware/auth');
-const TeamPlayer = require('./database/models/TeamPlayer');
+
 
 
 const configureApp = async () => {

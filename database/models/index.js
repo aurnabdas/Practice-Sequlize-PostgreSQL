@@ -25,8 +25,7 @@ Player.belongsToMany(Team, { through: "TeamPlayer" })
 module.exports = {
   User,
   Team,
-  Player, 
-  
+  Player
 };
 
 // to check the list of tables you have in postgresql make sure you are in the webdevbackend database and type \dt
