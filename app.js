@@ -1,6 +1,6 @@
 const createDB = require('./database/utils/createDB');
 const seedDB = require('./database/utils/seedDB');
-const { User, Team } = require('./database/models');
+const { User, Team , Player} = require('./database/models');
 const ash = require('express-async-handler');
 
 const db = require('./database');
@@ -31,7 +31,8 @@ const express = require("express");
 const app = express();
 const cors = require('cors')
 
-const handleLogin = require('./middlware/auth')
+const handleLogin = require('./middlware/auth');
+const TeamPlayer = require('./database/models/TeamPlayer');
 
 
 const configureApp = async () => {
@@ -109,6 +110,27 @@ app.post('/auth', handleLogin);
     .catch(err => next(err))
   })
 
+// this creates a team for the user that is currently logged in and also links it to the current user
+  app.post('/userteamlink', async (req, res, next) => {
+    const { userId, teamInfo } = req.body; // Assuming teamInfo contains the team data
+
+    try {
+        // First check if the user is in the database
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Create a new team and associate user
+        const createdTeam = await Team.create({ ...teamInfo, userId: user.id });
+
+        res.status(200).json(createdTeam);
+    } catch (err) {
+        next(err);
+    }
+});
+
+
   //changes the player on a team
   app.put('/team/:id', ash(async(req, res) => {
     await Team.update(req.body,
@@ -144,8 +166,66 @@ app.post('/auth', handleLogin);
       .then(() => res.status(200).json("Deleted a Point Guard!"))
       .catch(err => next(err));
   });
+
+  
   
  
+//player 
+
+app.get('/player/', ash(async(req, res) => {
+  let player = await Player.findAll();
+  res.status(200).json(player);
+}));
+
+  //adding new player 
+  app.post('/player', function(req,res,next){
+    let team = Team.create(req.body).then(createdTeam => res.status(200).json(createdTeam))
+    .catch(err => next(err))
+
+  })
+
+// to check what player is in what team 
+app.get('/junction/', ash(async(req, res) => {
+  let team = await Team.findAll({include:[Player]});
+  
+  
+  res.status(200).json(team);
+}));
+
+// this creates/checks if a player is already in the database, then it will add this person's team
+app.post('/createPlayerAndAddToTeam', async (req, res) => {
+  const { teamId, playerData } = req.body; // playerData contains the details of the player to be created or found
+
+  try {
+      // Define the criteria to check for an existing player
+      // It's important that this checks a unique field, such as a player name or ID
+      const playerCriteria = { person: playerData.person }; // Example: Use a unique field like playerName
+
+      // Check if the player exists or create a new one
+      const [player, created] = await Player.findOrCreate({
+          where: playerCriteria,
+          defaults: playerData // used for creating the player if not found
+      });
+
+      // Find the team and add the player to it
+      const team = await Team.findByPk(teamId);
+      if (!team) {
+          return res.status(404).send('Team not found');
+      }
+
+      await team.addPlayer(player);
+
+      // Response message indicating whether the player was created or already existed
+      const message = created ? 'Player created and added to team' : 'Player already existed and was added to team';
+
+      res.status(200).json({ message, player });
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+});
+
+
+
 
 
   // Handle page not found:

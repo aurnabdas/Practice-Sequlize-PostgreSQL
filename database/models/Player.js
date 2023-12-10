@@ -4,12 +4,14 @@ const db = require('../db');
 
 const Player = db.define("players", {
 
-  Player: {
+  person: {
     type: Sequelize.STRING,
-    
+    allowNull: false
+  },
+  points:{
+    type: Sequelize.INTEGER,
   }
-  
-  
+
 });
 
 module.exports = Player;

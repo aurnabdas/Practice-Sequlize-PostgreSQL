@@ -1,4 +1,4 @@
-const { User, Team } = require('../models');
+const { User, Team, Player } = require('../models');
 
 const seedDB = async () => {
 	const dummyUser= await User.create({
@@ -14,36 +14,40 @@ const seedDB = async () => {
 
     const dummyTeam = await Team.create({
         Name: "Boston",
-		PG: "Ja Morant",
-        SG: "Cam Thomas",
-        G: "Tyrese Haliburton",
-        SF: "Lebron James",
-        PF: "Domantas Sabonis",
-        C1: "Nikola Jokic",
-        C2: "Joel Embid",
-        C3: "Rudy Golbert",
-        Any1: "Jalen Brunson",
-        Any2: "Joe Ingles",
-        userId: dummyUser.id
+        userId: dummyUser.id,
         
         
 	});
 
     const dummyTeam2 = await Team.create({
         Name: "New York",
-		PG: "Trae Young",
-        SG: "Klay Thompson",
-        G: "Tyrese Haliburton",
-        SF: "Kevin Durant",
-        PF: "Chet Holmgren",
-        C1: "Brook Lopez",
-        C2: "Joel Embid",
-        C3: "Rudy Golbert",
-        Any1: "Kawhi Leonard",
-        Any2: "Jayson Tatum",
-        userId: dummyUser2.id
+        userId: dummyUser2.id,
+        
+
         
 	});
+
+    const dummyPlayer = await Player.create({
+        person: "Jayson Tatum",
+        points: 43,
+        teamId: dummyTeam.id
+
+        
+        
+	});
+
+    const dummyPlayer2 = await Player.create({
+        person: "Jalen Brunson",
+        points: 38,
+        teamId: dummyTeam2.id
+
+	});
+
+    // await dummyTeam.addPlayer(dummyPlayer);
+
+    // let player =  Player.findAll({include:[Team]});
+    // let ids = player.teams
+    // console.log(ids)
     
 
     // the setUser is only aviable because of line 5 in index.js within models/index.js. 

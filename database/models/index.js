@@ -1,5 +1,7 @@
 const User  = require('./User');
 const Team  = require('./Team');
+const Player = require('./Player')
+
 
 // this is one to many as in each player has a specific team 
 // User.belongsTo(Team);    // user table will have the foreign key for team 
@@ -12,11 +14,19 @@ User.hasOne(Team);
 Team.belongsTo(User);
 
 
+Team.belongsToMany(Player, { through: "TeamPlayer" })
+Player.belongsToMany(Team, { through: "TeamPlayer" })
+
+
+
+
 // i want to look more into the code above 
 
 module.exports = {
   User,
-  Team
+  Team,
+  Player, 
+  
 };
 
 // to check the list of tables you have in postgresql make sure you are in the webdevbackend database and type \dt
