@@ -9,7 +9,7 @@ const Player = db.define("players", {
     allowNull: false
   },
   points:{
-    type: Sequelize.INTEGER,
+    type: Sequelize.FLOAT(10,2)
   }
 
 });
