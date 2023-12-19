@@ -2,6 +2,11 @@ const createDB = require('./database/utils/createDB');
 const seedDB = require('./database/utils/seedDB');
 const { User, Team , Player} = require('./database/models');
 const ash = require('express-async-handler');
+require('dotenv').config();
+const OpenAI = require('openai').default;
+
+
+
 
 const db = require('./database');
 
@@ -33,6 +38,9 @@ const cors = require('cors')
 
 const handleLogin = require('./middlware/auth');
 
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY // Use environment variable for API key
+});
 
 
 const configureApp = async () => {
@@ -44,7 +52,21 @@ const configureApp = async () => {
   app.use(express.urlencoded({ extended: false }));
   app.get('/favicon.ico', (req, res) => res.status(204));
 
+  app.post('/getChatResponse', async (req, res) => {
+    try {
+        const { userInput } = req.body;
+        const chatCompletion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            max_tokens: 500,
+            messages: [{"role": "user", "content": userInput}],
+        });
 
+        res.json(chatCompletion.choices[0].message.content);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Error processing request');
+    }
+});
  
   app.get("/hello", (request, response) => {
     response.send("hello world!")
@@ -69,6 +91,23 @@ app.post('/auth', handleLogin);
     User.create(req.body).then(createdUser => res.status(200).json(createdUser))
     .catch(err => next(err))
   })
+
+  app.get('/getUserId/:username', async (req, res) => {
+    const username = req.params.username;
+
+    try {
+        const user = await User.findOne({ where: { user: username } });
+
+        if (user) {
+            res.json({ id: user.id });
+        } else {
+            res.status(404).send('User not found');
+        }
+    } catch (error) {
+        console.error('Database error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
  //changes in user password or username
   app.put('/user/:id', ash(async(req, res) => {
@@ -99,10 +138,19 @@ app.post('/auth', handleLogin);
   }));
 
   //get specific team
-  app.get('/team/:id', ash(async(req,res) =>{
-    let team = await Team.findByPk(req.params.id, {include:[User]}); // based on the value from :id, we will get that specific instance
-    res.status(200).json(team)
-  }));
+  // GET route for a specific team including its players
+  // this will be uses to display every player 
+app.get('/team/:id', async (req, res) => {
+  try {
+    const team = await Team.findByPk(req.params.id, {
+      include: [Player]
+    });
+    res.status(200).json(team);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
 
   //adding new team 
   app.post('/team', function(req,res,next){
@@ -184,6 +232,17 @@ app.get('/player/', ash(async(req, res) => {
 
   })
 
+// DELETE route to remove a player
+app.delete('/player/:id', async (req, res) => {
+  try {
+    await Player.destroy({ where: { id: req.params.id } });
+    res.status(200).json("Player deleted successfully.");
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+
 // to check what player is in what team 
 app.get('/junction/', ash(async(req, res) => {
   let team = await Team.findAll({include:[Player]});
@@ -223,6 +282,43 @@ app.post('/createPlayerAndAddToTeam', async (req, res) => {
       res.status(500).send(error.message);
   }
 });
+
+app.delete('/player/:id', async (req, res) => {
+  const playerId = req.params.id;
+
+  try {
+    // Assuming you have a Player model set up with Sequelize or similar ORM
+    const result = await Player.destroy({ where: { id: playerId } });
+
+    if (result > 0) {
+      res.status(200).json({ message: "Player deleted successfully." });
+    } else {
+      res.status(404).json({ message: "Player not found." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/player/:id', async (req, res) => {
+  const playerId = req.params.id;
+  const { person: newPersonName } = req.body; // Assuming the new name is sent in the request body
+
+  try {
+    // Again, assuming Player is your Sequelize model
+    const result = await Player.update({ person: newPersonName }, { where: { id: playerId } });
+
+    if (result[0] > 0) { // Sequelize update returns an array with the number of affected rows
+      res.status(200).json({ message: "Player updated successfully." });
+    } else {
+      res.status(404).json({ message: "Player not found." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 
 
 
