@@ -25,3 +25,11 @@ to run the server write the following:
 ```
 npm run dev
 ```
+## how this project meets the requirments 
+- we created three tables: Users, Teams, and Players
+- User and Team are associated with each other and Team and Player are assocaited with each other
+- their are routes that add to each table with a post request
+- routes that return all the infromation on the table 
+- there are put requests for all tables, based on id
+- deletion for each user, team and player based on id
+- and their are routes that return a specific instance of a model, including eveything they are associated with 
