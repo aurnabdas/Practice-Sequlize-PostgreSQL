@@ -25,9 +25,13 @@ to run the server write the following:
 ```
 npm run dev
 ```
-## how this project meets the requirments 
+## how this project meets the requirements 
+
+this is done in database/model/team.js, player.js and user.js
 - we created three tables: Users, Teams, and Players
 - User and Team are associated with each other and Team and Player are assocaited with each other
+
+everything below is done from lines 20 to 216 in app.js
 - their are routes that add to each table with a post request
 - routes that return all the infromation on the table 
 - there are put requests for all tables, based on id
