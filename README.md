@@ -33,3 +33,5 @@ npm run dev
 - there are put requests for all tables, based on id
 - deletion for each user, team and player based on id
 - and their are routes that return a specific instance of a model, including eveything they are associated with 
+
+all this is done from lines 20 to 216 in app.js
